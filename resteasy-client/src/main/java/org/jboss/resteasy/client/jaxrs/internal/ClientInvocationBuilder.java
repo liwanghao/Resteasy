@@ -279,6 +279,24 @@ public class ClientInvocationBuilder implements Invocation.Builder
    }
 
    @Override
+   public Response patch(Entity<?> entity)
+   {
+      return build("PATCH").invoke();
+   }
+
+   @Override
+   public <T> T patch(Entity<?> entity, Class<T> responseType)
+   {
+      return build("PATCH").invoke(responseType);
+   }
+
+   @Override
+   public <T> T patch(Entity<?> entity, GenericType<T> responseType)
+   {
+      return build("PATCH").invoke(responseType);
+   }
+
+   @Override
    public Response method(String name)
    {
       return build(name).invoke();
@@ -351,26 +369,4 @@ public class ClientInvocationBuilder implements Invocation.Builder
       }
    }
 
-
-
-   @Override
-   public Response patch()
-   {
-      // TODO Auto-generated method stub
-      return null;
-   }
-
-   @Override
-   public <T> T patch(Class<T> responseType)
-   {
-      // TODO Auto-generated method stub
-      return null;
-   }
-
-   @Override
-   public <T> T patch(GenericType<T> responseType)
-   {
-      // TODO Auto-generated method stub
-      return null;
-   }
 }
