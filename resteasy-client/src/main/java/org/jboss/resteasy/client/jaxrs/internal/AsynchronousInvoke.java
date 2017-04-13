@@ -70,6 +70,7 @@ public class AsynchronousInvoke implements AsyncInvoker
       return method("TRACE", callback);
    }
 
+
    @Override
    public Future<Response> put(Entity<?> entity)
    {
@@ -271,4 +272,5 @@ public Future<Response> patch(Entity<?> entity)
       // TODO Auto-generated method stub
       return null;
    }
+
 }

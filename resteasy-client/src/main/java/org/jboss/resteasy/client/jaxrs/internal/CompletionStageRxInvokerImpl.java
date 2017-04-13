@@ -284,6 +284,7 @@ public class CompletionStageRxInvokerImpl implements CompletionStageRxInvoker
       }
    }
 
+
    @Override
    public CompletionStage<Response> method(String name)
    {
@@ -421,4 +422,5 @@ public class CompletionStageRxInvokerImpl implements CompletionStageRxInvoker
          return CompletableFuture.supplyAsync(() -> builder.patch(entity, responseType), executor);
       }
    }
+
 }
