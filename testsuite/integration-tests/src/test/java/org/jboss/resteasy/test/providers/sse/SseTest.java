@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -25,6 +26,7 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 
 @RunWith(Arquillian.class)
 @RunAsClient
@@ -137,6 +139,44 @@ public class SseTest {
        client2.close();
     }
 
+    @Test//(expected = IllegalArgumentException.class)
+    public void testSseEventSubscribe() throws Exception {
+        final List<String> onEventResults = new ArrayList<>();
+        final AtomicInteger onErrorCount = new AtomicInteger();
+        final String[] onCompleteResult = { null };
+        Client client = new ResteasyClientBuilder().connectionPoolSize(10).build();
+        WebTarget target = client.target(generateURL("/service/server-sent-events/"));
+        SseEventSource eventSource = new SseEventSourceImpl.SourceBuilder(target).build();
+        eventSource.subscribe(event -> {
+            onEventResults.add(event.readData());
+        }, t -> {
+            onErrorCount.addAndGet();
+        }, () -> {
+            onCompleteResult[0] = new String("There will be no further events.");
+        });
+        eventSource.open();
+
+        for (int counter = 0; counter < 5; counter++) {
+            target.request().post(Entity.text("message" + counter));
+        }
+        Thread.sleep(3000);
+        Assert.assertTrue("5 message expected.", onEventResults.size() == 5);
+
+        /*
+        //Trigger an error
+        try{
+            eventSource.subscribe(null);
+        }catch (IllegalArgumentException e){
+            e.printStackTrace();
+        }
+        */
+
+        eventSource.close();
+        //onCompleteResult[0] = new String("There will be no further events.");
+        Assert.assertTrue("Expected no events.","There will be no further events.".equals(onCompleteResult[0]));
+        //Assert.assertTrue(onErrorCount.get()==1);
+        //Assert.assertNull(onCompleteResult[0]);
+    }
 //    @Test
 //    //This will open a browser and test with html sse client
 //    public void testHtmlSse() throws Exception
