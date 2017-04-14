@@ -1,6 +1,9 @@
 package org.jboss.resteasy.test.providers.sse;
 
+import org.jboss.resteasy.plugins.providers.sse.OutboundSseEventImpl;
+
 import java.io.IOException;
+import java.lang.reflect.Type;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -10,6 +13,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.sse.OutboundSseEvent;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseBroadcaster;
 import javax.ws.rs.sse.SseEventSink;
@@ -41,6 +45,16 @@ public class SseResource
            throw new IllegalStateException("No client connected.");
        }
        eventSink.send(sse.newEvent(message));
+   }
+
+   @Path("/error")
+   @POST
+   public void addErrorMessage(final String message) throws IOException{
+       if (eventSink == null) {
+           throw new IllegalStateException("No client connected.");
+       }
+       //send a null message.
+       eventSink.send(sse.newEventBuilder().data(null).build());
    }
    
    @GET

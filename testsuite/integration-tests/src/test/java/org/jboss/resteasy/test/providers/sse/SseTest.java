@@ -13,6 +13,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.sse.SseEventSource;
 
+import com.sun.org.apache.xerces.internal.impl.dv.dtd.ENTITYDatatypeValidator;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
@@ -139,7 +140,7 @@ public class SseTest {
        client2.close();
     }
 
-    @Test//(expected = IllegalArgumentException.class)
+    @Test
     public void testSseEventSubscribe() throws Exception {
         final List<String> onEventResults = new ArrayList<>();
         final AtomicInteger onErrorCount = new AtomicInteger();
@@ -150,7 +151,7 @@ public class SseTest {
         eventSource.subscribe(event -> {
             onEventResults.add(event.readData());
         }, t -> {
-            onErrorCount.addAndGet();
+            onErrorCount.incrementAndGet();
         }, () -> {
             onCompleteResult[0] = new String("There will be no further events.");
         });
@@ -162,19 +163,18 @@ public class SseTest {
         Thread.sleep(3000);
         Assert.assertTrue("5 message expected.", onEventResults.size() == 5);
 
-        /*
+
         //Trigger an error
-        try{
-            eventSource.subscribe(null);
-        }catch (IllegalArgumentException e){
-            e.printStackTrace();
-        }
-        */
+        Client errClient = ClientBuilder.newClient();
+        WebTarget errTarget = errClient.target(generateURL("/service/server-sent-events/error"));
+        errTarget.request().post(Entity.text("error message"));
+        Thread.sleep(500);
+
 
         eventSource.close();
         //onCompleteResult[0] = new String("There will be no further events.");
-        Assert.assertTrue("Expected no events.","There will be no further events.".equals(onCompleteResult[0]));
-        //Assert.assertTrue(onErrorCount.get()==1);
+        //Assert.assertTrue("Expected no events.","There will be no further events.".equals(onCompleteResult[0]));
+        Assert.assertTrue(onErrorCount.get()==1);
         //Assert.assertNull(onCompleteResult[0]);
     }
 //    @Test
