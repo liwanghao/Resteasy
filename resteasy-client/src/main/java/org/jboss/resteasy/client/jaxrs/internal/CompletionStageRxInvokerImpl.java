@@ -271,19 +271,6 @@ public class CompletionStageRxInvokerImpl implements CompletionStageRxInvoker
       }
    }
 
-   @Override
-   public <T> CompletionStage<T> trace(GenericType<T> responseType)
-   {
-      if (executor == null)
-      {
-         return CompletableFuture.supplyAsync(() -> builder.trace(responseType));
-      }
-      else
-      {
-         return CompletableFuture.supplyAsync(() -> builder.trace(responseType), executor);
-      }
-   }
-
 
    @Override
    public CompletionStage<Response> method(String name)

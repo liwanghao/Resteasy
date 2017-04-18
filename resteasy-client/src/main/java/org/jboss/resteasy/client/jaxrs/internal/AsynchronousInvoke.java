@@ -72,6 +72,30 @@ public class AsynchronousInvoke implements AsyncInvoker
 
 
    @Override
+   public Future<Response> patch(Entity<?> entity)
+   {
+     return method(HttpMethod.PATCH);
+   }
+
+   @Override
+   public <T> Future<T> patch(Entity<?> entity, Class<T> responseType)
+   {
+     return method(HttpMethod.PATCH, entity, responseType);
+   }
+
+   @Override
+   public <T> Future<T> patch(Entity<?> entity, GenericType<T> responseType)
+   {
+     return method(HttpMethod.PATCH, entity, responseType);
+   }
+
+   @Override
+   public <T> Future<T> patch(Entity<?> entity, InvocationCallback<T> callback)
+   {
+     return method(HttpMethod.PATCH, entity, callback);
+   }
+
+   @Override
    public Future<Response> put(Entity<?> entity)
    {
       return method(HttpMethod.PUT, entity);
@@ -242,35 +266,6 @@ public class AsynchronousInvoke implements AsyncInvoker
       invocation.setMethod(name);
       invocation.setEntity(entity);
       return invocation.submit(callback);
-   }
-
-
-@Override
-public Future<Response> patch(Entity<?> entity)
-{
-   // TODO Auto-generated method stub
-   return null;
-}
-
-   @Override
-   public <T> Future<T> patch(Entity<?> entity, Class<T> responseType)
-   {
-      // TODO Auto-generated method stub
-      return null;
-   }
-
-   @Override
-   public <T> Future<T> patch(Entity<?> entity, GenericType<T> responseType)
-   {
-      // TODO Auto-generated method stub
-      return null;
-   }
-
-   @Override
-   public <T> Future<T> patch(Entity<?> entity, InvocationCallback<T> callback)
-   {
-      // TODO Auto-generated method stub
-      return null;
    }
 
 }
