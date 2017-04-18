@@ -144,7 +144,7 @@ public class SseTest {
     public void testSseEventSubscribe() throws Exception {
         final List<String> onEventResults = new ArrayList<>();
         final AtomicInteger onErrorCount = new AtomicInteger();
-        final String[] onCompleteResult = { null };
+        final StringBuilder onCompleteResult = new StringBuilder();
         Client client = new ResteasyClientBuilder().connectionPoolSize(10).build();
         WebTarget target = client.target(generateURL("/service/server-sent-events/"));
         SseEventSource eventSource = new SseEventSourceImpl.SourceBuilder(target).build();
@@ -153,14 +153,14 @@ public class SseTest {
         }, t -> {
             onErrorCount.incrementAndGet();
         }, () -> {
-            onCompleteResult[0] = new String("There will be no further events.");
+            onCompleteResult.append("There will be no further events.");
         });
         eventSource.open();
 
         for (int counter = 0; counter < 5; counter++) {
             target.request().post(Entity.text("message" + counter));
         }
-        Thread.sleep(3000);
+        //Thread.sleep(3000);
         Assert.assertTrue("5 message expected.", onEventResults.size() == 5);
 
 
@@ -168,14 +168,12 @@ public class SseTest {
         Client errClient = ClientBuilder.newClient();
         WebTarget errTarget = errClient.target(generateURL("/service/server-sent-events/error"));
         errTarget.request().post(Entity.text("error message"));
-        Thread.sleep(500);
+        //Thread.sleep(500);
 
 
         eventSource.close();
-        //onCompleteResult[0] = new String("There will be no further events.");
-        //Assert.assertTrue("Expected no events.","There will be no further events.".equals(onCompleteResult[0]));
-        Assert.assertTrue(onErrorCount.get()==1);
-        //Assert.assertNull(onCompleteResult[0]);
+        //Assert.assertTrue("Expected no events.","There will be no further events.".equals(onCompleteResult.toString()));
+        Assert.assertTrue("Expected onErrorCount == 1, but is "+onErrorCount.get(),onErrorCount.get()==1);
     }
 //    @Test
 //    //This will open a browser and test with html sse client
